@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ periode|yesno:"Edit,Tambah" }} Periode Piket - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-calendar-range"></i> 
+                    {% if periode %}Edit{% else %}Tambah{% endif %} Periode Piket
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="kepengurusan_lab_id" class="form-label">Kepengurusan Lab <span class="text-danger">*</span></label>
+                        <select class="form-select" id="kepengurusan_lab_id" name="kepengurusan_lab_id" required>
+                            <option value="">-- Pilih Kepengurusan Lab --</option>
+                            {% for kepengurusan in kepengurusan_labs %}
+                                <option value="{{ kepengurusan.id }}" 
+                                    {% if periode and periode.kepengurusan_lab_id == kepengurusan.id %}selected{% endif %}>
+                                    {{ kepengurusan.get_display_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Pilih kepengurusan lab yang sesuai</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="nama" class="form-label">Nama Periode</label>
+                        <input type="text" class="form-control" id="nama" name="nama" 
+                               value="{% if periode %}{{ periode.nama }}{% endif %}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tanggal_mulai" class="form-label">Tanggal Mulai</label>
+                        <input type="date" class="form-control" id="tanggal_mulai" name="tanggal_mulai" 
+                               value="{% if periode %}{{ periode.tanggal_mulai|date:'Y-m-d' }}{% endif %}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tanggal_selesai" class="form-label">Tanggal Selesai</label>
+                        <input type="date" class="form-control" id="tanggal_selesai" name="tanggal_selesai" 
+                               value="{% if periode %}{{ periode.tanggal_selesai|date:'Y-m-d' }}{% endif %}" required>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="isactive" name="isactive"
+                               {% if periode.isactive %}checked{% endif %}>
+                        <label class="form-check-label" for="isactive">
+                            Aktifkan periode ini
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-custom">
+                            <i class="bi bi-save"></i> Simpan
+                        </button>
+                        <a href="{% url 'piket_management:periode_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

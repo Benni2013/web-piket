@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Akhiri Piket - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-stop-circle"></i> Akhiri Piket</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    Ambil 1 foto wajah dan isi kegiatan untuk mengakhiri piket.
+                </div>
+                
+                <div class="video-container">
+                    <video id="video" autoplay playsinline></video>
+                    <div class="capture-overlay">
+                        <div class="text-center">
+                            <div class="spinner-border text-danger" role="status"></div>
+                            <div class="mt-2 fw-bold">Processing...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <label for="kegiatan" class="form-label">
+                        <strong>Kegiatan yang Dilakukan:</strong>
+                    </label>
+                    <textarea id="kegiatan" class="form-control" rows="4" 
+                              placeholder="Contoh: Membersihkan lab, mengecek komputer, update inventaris..."
+                              required></textarea>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button id="endBtn" class="btn btn-danger btn-custom" onclick="akhiriPiket()">
+                        <i class="bi bi-stop-fill"></i> Ambil Foto & Akhiri Piket
+                    </button>
+                    <a href="{% url 'attendance:dashboard' %}" class="btn btn-secondary btn-custom">
+                        <i class="bi bi-x-circle"></i> Batal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Start camera on page load
+window.addEventListener('DOMContentLoaded', async () => {
+    await startCamera('video');
+});
+
+async function akhiriPiket() {
+    const kegiatan = document.getElementById('kegiatan').value.trim();
+    
+    if (!kegiatan) {
+        alert('Mohon isi kegiatan yang dilakukan!');
+        return;
+    }
+    
+    try {
+        document.getElementById('endBtn').disabled = true;
+        document.querySelector('.capture-overlay').classList.add('active');
+        
+        // Capture single image
+        const image = captureImage('video');
+        
+        // Send to server
+        const response = await fetch('{% url "attendance:akhiri_piket" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ 
+                image: image,
+                kegiatan: kegiatan
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Piket berhasil diakhiri!');
+            window.location.href = result.redirect;
+        } else {
+            alert('Error: ' + result.message);
+            document.getElementById('endBtn').disabled = false;
+            document.querySelector('.capture-overlay').classList.remove('active');
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan: ' + error.message);
+        document.getElementById('endBtn').disabled = false;
+        document.querySelector('.capture-overlay').classList.remove('active');
+    }
+}
+</script>
+{% endblock %}

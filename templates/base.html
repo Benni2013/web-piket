@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Web Piket SILAB{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .main-content {
+            padding: 2rem 0;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+        }
+        
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 30px;
+            font-weight: 500;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+        
+        #video, #canvas {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .capture-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            background: rgba(255, 255, 255, 0.8);
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        
+        .capture-overlay.active {
+            display: flex;
+        }
+        
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .badge-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+        
+        .footer {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 1rem 0;
+            margin-top: 3rem;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.3);">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'attendance:dashboard' %}">
+                <i class="bi bi-calendar-check"></i> Web Piket SILAB
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if request.session.user_id %}
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'attendance:dashboard' %}">
+                            <i class="bi bi-house-door"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-badge"></i> Wajah
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'face_vectors:insert' %}">Tambah Vektor Wajah</a></li>
+                            <li><a class="dropdown-item" href="{% url 'face_vectors:update' %}">Update Vektor Wajah</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-calendar3"></i> Manajemen
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'piket_management:periode_list' %}">Periode Piket</a></li>
+                            <li><a class="dropdown-item" href="{% url 'piket_management:jadwal_list' %}">Jadwal Piket</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'attendance:report_absensi' %}">
+                            <i class="bi bi-file-earmark-text"></i> Report
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ request.session.user_name }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% else %}
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Web Piket SILAB. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Camera Streaming JS -->
+    <script>
+        // Camera functions
+        let videoStream = null;
+        let capturedImages = [];
+        
+        async function startCamera(videoElementId) {
+            try {
+                const video = document.getElementById(videoElementId);
+                videoStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    } 
+                });
+                video.srcObject = videoStream;
+                return true;
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.');
+                return false;
+            }
+        }
+        
+        function stopCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+        }
+        
+        function captureImage(videoElementId) {
+            const video = document.getElementById(videoElementId);
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+        
+        async function captureMultipleImages(videoElementId, count, delay) {
+            capturedImages = [];
+            const overlay = document.querySelector('.capture-overlay');
+            
+            for (let i = 0; i < count; i++) {
+                if (overlay) {
+                    overlay.classList.add('active');
+                    overlay.querySelector('.spinner-border + div').textContent = 
+                        `Capturing ${i + 1}/${count}...`;
+                }
+                
+                const image = captureImage(videoElementId);
+                capturedImages.push(image);
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+                
+                if (overlay) {
+                    overlay.classList.remove('active');
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            return capturedImages;
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

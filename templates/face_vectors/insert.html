@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Tambah Vektor Wajah - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-person-badge"></i> Tambah Vektor Wajah</h4>
+            </div>
+            <div class="card-body text-center p-4">
+                <p class="lead">Pilih metode untuk menambahkan vektor wajah:</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <i class="bi bi-camera-video" style="font-size: 4rem; color: #667eea;"></i>
+                                <h5 class="mt-3">Streaming Kamera</h5>
+                                <p class="text-muted">Capture 20 foto otomatis dengan kamera</p>
+                                <a href="{% url 'face_vectors:insert_camera' %}" class="btn btn-primary btn-custom">
+                                    <i class="bi bi-camera-video"></i> Buka Kamera
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <i class="bi bi-upload" style="font-size: 4rem; color: #764ba2;"></i>
+                                <h5 class="mt-3">Upload Foto</h5>
+                                <p class="text-muted">Upload foto wajah dari file</p>
+                                <a href="{% url 'face_vectors:insert_upload' %}" class="btn btn-secondary btn-custom">
+                                    <i class="bi bi-upload"></i> Upload Foto
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="{% url 'attendance:dashboard' %}" class="btn btn-outline-secondary mt-3">
+                    <i class="bi bi-arrow-left"></i> Kembali
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

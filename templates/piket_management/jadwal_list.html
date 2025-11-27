@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Jadwal Piket - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-calendar3"></i> Manajemen Jadwal Piket</h4>
+                <a href="{% url 'piket_management:jadwal_create' %}" class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-circle"></i> Tambah Jadwal
+                </a>
+            </div>
+            <div class="card-body">
+                {% if jadwals %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Hari</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for jadwal in jadwals %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ jadwal.user.name }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ jadwal.hari }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'piket_management:jadwal_update' jadwal.id %}" 
+                                       class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'piket_management:jadwal_delete' jadwal.id %}" 
+                                       class="btn btn-sm btn-danger" title="Hapus"
+                                       onclick="return confirm('Yakin ingin menghapus jadwal ini?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-x" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">Belum ada jadwal piket</p>
+                    <a href="{% url 'piket_management:jadwal_create' %}" class="btn btn-primary btn-custom">
+                        <i class="bi bi-plus-circle"></i> Tambah Jadwal Pertama
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

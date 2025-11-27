@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ jadwal|yesno:"Edit,Tambah" }} Jadwal Piket - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-calendar3"></i> 
+                    {% if jadwal %}Edit{% else %}Tambah{% endif %} Jadwal Piket
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label">Pilih User</label>
+                        <select class="form-select" id="user_id" name="user_id" required>
+                            <option value="">-- Pilih User --</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" 
+                                    {% if jadwal and jadwal.user.id == user.id %}selected{% endif %}>
+                                {{ user.name }} ({{ user.email }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="kepengurusan_lab_id" class="form-label">Kepengurusan Lab <span class="text-danger">*</span></label>
+                        <select class="form-select" id="kepengurusan_lab_id" name="kepengurusan_lab_id" required>
+                            <option value="">-- Pilih Kepengurusan Lab --</option>
+                            {% for kepengurusan in kepengurusan_labs %}
+                                <option value="{{ kepengurusan.id }}" 
+                                    {% if jadwal and jadwal.kepengurusan_lab_id == kepengurusan.id %}selected{% endif %}>
+                                    {{ kepengurusan.get_display_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Pilih kepengurusan lab yang sesuai</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hari" class="form-label">Hari</label>
+                        <select class="form-select" id="hari" name="hari" required>
+                            <option value="">-- Pilih Hari --</option>
+                            <option value="Senin" {% if jadwal and jadwal.hari == "Senin" %}selected{% endif %}>Senin</option>
+                            <option value="Selasa" {% if jadwal and jadwal.hari == "Selasa" %}selected{% endif %}>Selasa</option>
+                            <option value="Rabu" {% if jadwal and jadwal.hari == "Rabu" %}selected{% endif %}>Rabu</option>
+                            <option value="Kamis" {% if jadwal and jadwal.hari == "Kamis" %}selected{% endif %}>Kamis</option>
+                            <option value="Jumat" {% if jadwal and jadwal.hari == "Jumat" %}selected{% endif %}>Jumat</option>
+                            <option value="Sabtu" {% if jadwal and jadwal.hari == "Sabtu" %}selected{% endif %}>Sabtu</option>
+                            <option value="Minggu" {% if jadwal and jadwal.hari == "Minggu" %}selected{% endif %}>Minggu</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-custom">
+                            <i class="bi bi-save"></i> Simpan
+                        </button>
+                        <a href="{% url 'piket_management:jadwal_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+# ============================================================================
+# .gitignore for Django Web Piket Project
+# ============================================================================
+
+# ============================================================================
+# Python
+# ============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ============================================================================
+# Django specific
+# ============================================================================
+# Database
+*.sqlite3
+*.db
+db.sqlite3
+db.sqlite3-journal
+
+# Logs
+*.log
+local_settings.py
+
+# Static files (collected)
+/static/
+/staticfiles/
+/static_root/
+
+# Media files (uploaded)
+/media/
+
+# Django migrations (OPTIONAL - uncomment to ignore)
+# */migrations/*.py
+# */migrations/*.pyc
+# !*/migrations/__init__.py
+
+# Django secret files
+*.secret
+*.pot
+
+# Session files
+*.session
+
+# ============================================================================
+# IDEs & Editors
+# ============================================================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm / IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================================
+# Operating System
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+# Backup files
+*.bak
+*.backup
+*_backup.py
+
+# Test SQL dumps
+silab_tes.sql
+
+# Local configuration
+local_config.py
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Documentation builds
+docs/_build/
+site/

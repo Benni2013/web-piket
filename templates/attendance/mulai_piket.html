@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Mulai Piket - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-play-circle"></i> Mulai Piket</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Ambil 1 foto wajah untuk memulai piket. Sistem akan mengenali wajah Anda.
+                </div>
+                
+                <div class="video-container">
+                    <video id="video" autoplay playsinline></video>
+                    <div class="capture-overlay">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <div class="mt-2 fw-bold">Processing...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button id="startBtn" class="btn btn-success btn-custom" onclick="startPiket()">
+                        <i class="bi bi-camera"></i> Ambil Foto & Mulai Piket
+                    </button>
+                    <a href="{% url 'attendance:dashboard' %}" class="btn btn-secondary btn-custom">
+                        <i class="bi bi-x-circle"></i> Batal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Start camera on page load
+window.addEventListener('DOMContentLoaded', async () => {
+    await startCamera('video');
+});
+
+async function startPiket() {
+    try {
+        document.getElementById('startBtn').disabled = true;
+        document.querySelector('.capture-overlay').classList.add('active');
+        
+        // Capture single image
+        const image = captureImage('video');
+        
+        // Send to server
+        const response = await fetch('{% url "attendance:mulai_piket" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ image: image })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Piket berhasil dimulai!');
+            window.location.href = result.redirect;
+        } else {
+            alert('Error: ' + result.message);
+            document.getElementById('startBtn').disabled = false;
+            document.querySelector('.capture-overlay').classList.remove('active');
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan: ' + error.message);
+        document.getElementById('startBtn').disabled = false;
+        document.querySelector('.capture-overlay').classList.remove('active');
+    }
+}
+</script>
+{% endblock %}

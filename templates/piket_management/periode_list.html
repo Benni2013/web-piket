@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Periode Piket - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-calendar-range"></i> Manajemen Periode Piket</h4>
+                <a href="{% url 'piket_management:periode_create' %}" class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-circle"></i> Tambah Periode
+                </a>
+            </div>
+            <div class="card-body">
+                {% if periodes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Periode</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for periode in periodes %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ periode.nama }}</td>
+                                <td>{{ periode.tanggal_mulai|date:"d M Y" }}</td>
+                                <td>{{ periode.tanggal_selesai|date:"d M Y" }}</td>
+                                <td>
+                                    {% if periode.isactive %}
+                                    <span class="badge bg-success">Aktif</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Tidak Aktif</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not periode.isactive %}
+                                    <a href="{% url 'piket_management:periode_activate' periode.id %}" 
+                                       class="btn btn-sm btn-success" title="Aktifkan">
+                                        <i class="bi bi-check-circle"></i>
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'piket_management:periode_update' periode.id %}" 
+                                       class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'piket_management:periode_delete' periode.id %}" 
+                                       class="btn btn-sm btn-danger" title="Hapus"
+                                       onclick="return confirm('Yakin ingin menghapus periode ini?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-x" style="font-size: 4rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">Belum ada periode piket</p>
+                    <a href="{% url 'piket_management:periode_create' %}" class="btn btn-primary btn-custom">
+                        <i class="bi bi-plus-circle"></i> Tambah Periode Pertama
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

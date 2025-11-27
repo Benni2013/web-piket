@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Foto Wajah - Web Piket SILAB{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-upload"></i> Upload Foto Wajah</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Upload foto wajah dengan kualitas baik dan pencahayaan cukup.
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="photo" class="form-label">Pilih Foto</label>
+                        <input type="file" class="form-control" id="photo" name="photo" 
+                               accept="image/*" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-custom">
+                            <i class="bi bi-upload"></i> Upload & Simpan
+                        </button>
+                        <a href="{% url 'face_vectors:insert' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Kembali
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
