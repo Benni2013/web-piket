@@ -16,12 +16,14 @@ Web application untuk consume API Piket dengan fitur lengkap manajemen absensi p
 
 ### 3. **Manajemen Periode Piket**
 - ✅ CRUD periode piket
+- ✅ Pilih kepengurusan lab dari dropdown
 - ✅ Aktifkan/nonaktifkan periode
 - ✅ Set tanggal mulai & selesai
 
 ### 4. **Manajemen Jadwal Piket**
 - ✅ CRUD jadwal piket
-- ✅ Assign user ke hari & shift tertentu
+- ✅ Pilih kepengurusan lab dari dropdown
+- ✅ Assign user ke hari tertentu
 - ✅ List semua jadwal
 
 ### 5. **Absensi Piket**
@@ -134,7 +136,7 @@ web/
 │   └── urls.py
 │
 ├── piket_management/       # App: CRUD Periode & Jadwal
-│   ├── models.py           # PeriodePiket, JadwalPiket models
+│   ├── models.py           # PeriodePiket, JadwalPiket, KepengurusanLab models
 │   ├── views.py            # CRUD views
 │   └── urls.py
 │
@@ -158,8 +160,9 @@ web/
 ```
 1. Register user pertama
 2. Login
-3. Buat periode piket aktif (Manajemen > Periode Piket)
-4. Buat jadwal piket untuk setiap user (Manajemen > Jadwal Piket)
+3. Setup kepengurusan lab (Manajemen > Kepengurusan Lab)
+4. Buat periode piket aktif (Manajemen > Periode Piket)
+5. Buat jadwal piket untuk setiap user (Manajemen > Jadwal Piket)
 ```
 
 ### 2. Setup Vektor Wajah (User)
@@ -297,7 +300,37 @@ Solusi:
 3. Cek apakah kamera sedang digunakan aplikasi lain
 ```
 
-### Problem 4: Face not recognized
+### Problem 4: Foreign key constraint error
+
+```
+Error: Cannot add or update a child row: a foreign key constraint fails 
+(`silab`.`periode_piket`, CONSTRAINT `periode_piket_kepengurusan_lab_id_foreign`)
+
+Penyebab: 
+Mencoba create periode/jadwal tanpa memilih kepengurusan lab yang valid.
+
+Solusi:
+1. Pastikan ada data kepengurusan_lab di database
+2. Pilih kepengurusan lab dari dropdown (WAJIB)
+3. Jangan biarkan field kepengurusan_lab_id kosong
+```
+
+### Problem 5: Unknown column 'absensi.user_id'
+
+```
+Error: Unknown column 'absensi.user_id' in 'field list'
+
+Penyebab:
+Web Django dan API sudah diupdate tapi ada cached models lama.
+
+Solusi:
+1. Restart Django server: Ctrl+C lalu python manage.py runserver
+2. Restart API Piket server
+3. Clear browser cache (Ctrl+Shift+Del)
+4. Hapus folder __pycache__ di semua apps
+```
+
+### Problem 6: Face not recognized
 
 ```
 Error: Face not recognized. Please register first.
@@ -332,10 +365,11 @@ created_at, updated_at (TIMESTAMP)
 ### PeriodePiket (dari SILAB)
 ```python
 id (CHAR 36 - UUID)
-nama_periode (VARCHAR 255)
+kepengurusan_lab_id (CHAR 36 - FK to kepengurusan_lab) - REQUIRED
+nama (VARCHAR 255)
 tanggal_mulai (DATE)
 tanggal_selesai (DATE)
-is_active (BOOLEAN)
+isactive (BOOLEAN)
 created_at, updated_at (TIMESTAMP)
 ```
 
@@ -344,21 +378,34 @@ created_at, updated_at (TIMESTAMP)
 id (CHAR 36 - UUID)
 user_id (CHAR 36 - FK to users)
 hari (VARCHAR 255 - Senin/Selasa/...)
-shift (VARCHAR 255 - Pagi/Siang/Sore)
+kepengurusan_lab_id (CHAR 36 - FK to kepengurusan_lab) - REQUIRED
 created_at, updated_at (TIMESTAMP)
 ```
 
 ### Absensi (dari SILAB)
 ```python
 id (CHAR 36 - UUID)
-user_id (CHAR 36 - FK to users)
 tanggal (DATE)
 jam_masuk (TIME)
 jam_keluar (TIME - nullable)
-foto (VARCHAR 255 - optional)
-jadwal_piket_id (CHAR 36 - FK to jadwal_piket)
-kegiatan (TEXT - nullable)
+foto (VARCHAR 255 - empty string saat mulai)
+jadwal_piket (CHAR 36 - FK to jadwal_piket) - NOT user_id!
+kegiatan (TEXT - empty string saat mulai, wajib saat akhiri)
 periode_piket_id (CHAR 36 - FK to periode_piket)
+created_at, updated_at (TIMESTAMP)
+
+CATATAN PENTING:
+- Tabel absensi TIDAK memiliki kolom user_id
+- User diakses melalui: absensi -> jadwal_piket -> user
+- Field jadwal_piket berisi UUID jadwal, bukan user_id
+```
+
+### KepengurusanLab (dari SILAB)
+```python
+id (CHAR 36 - UUID)
+tahun_kepengurusan_id (CHAR 36 - FK to tahun_kepengurusan)
+laboratorium_id (CHAR 36 - FK to laboratorium)
+sk (VARCHAR 255 - Surat Keputusan)
 created_at, updated_at (TIMESTAMP)
 ```
 
@@ -392,10 +439,19 @@ MIT License
 
 ## 👨‍💻 Development
 
-- **Version**: 1.0
-- **Framework**: Django 5.1
-- **Integration**: API Piket 3.0
-- **Last Updated**: November 2025
+- **Version**: 1.1.0
+- **Framework**: Django 5.1.3
+- **Integration**: API Piket 3.0.1
+- **Last Updated**: November 27, 2025
+- **Repository**: https://github.com/Benni2013/web-piket
+
+### Recent Updates (v1.1.0)
+- ✅ Fixed `absensi` model structure (removed `user_id` dependency)
+- ✅ Added `KepengurusanLab` model for proper foreign key relationships
+- ✅ Updated all views to query via `jadwal_piket` instead of direct `user_id`
+- ✅ Added dropdown fields for `kepengurusan_lab_id` in forms (periode & jadwal)
+- ✅ Fixed field names: `nama_periode` → `nama`, `is_active` → `isactive`
+- ✅ Comprehensive `.gitignore` for Django projects
 
 ---
 
